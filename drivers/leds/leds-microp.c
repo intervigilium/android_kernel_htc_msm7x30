@@ -112,25 +112,27 @@ static void microp_led_jogball_brightness_set(struct led_classdev *led_cdev,
 	spin_unlock_irqrestore(&ldata->brightness_lock, flags);
 
 	switch (brightness) {
-	case 0:
+	case LED_OFF:
 		data[0] = 0;
 		break;
-	case 1:
-		data[0] = 3;
-		data[1] = data[2] = 0xFF;
-		break;
-	case 3:
-		data[0] = 1;
-		data[1] = data[2] = 0xFF;
-		break;
-	case 7:
-		data[0] = 2;
-		data[1] = 0;
-		data[2] = 30;
-		break;
 	default:
-		pr_warning("%s: unknown value: %d\n", __func__, brightness);
-		break;
+		if (brightness == 1) {
+			data[0] = 3;
+			data[1] = data[2] = 0xFF;
+			break;
+		} else if (brightness == 2) {
+			data[0] = 1;
+			data[1] = data[2] = 0xFF;
+			break;
+		} else if (brightness == 7) {
+			data[0] = 2;
+			data[1] = 0;
+			data[2] = 30;
+			break;
+		} else {
+			pr_warning("%s: unknown value: %d\n", __func__, brightness);
+			break;
+		}
 	}
 	ret = microp_i2c_write(MICROP_I2C_WCMD_JOGBALL_LED_MODE, data, 3);
 	if (ret < 0)
@@ -158,22 +160,18 @@ static void microp_led_wimax_brightness_set(struct led_classdev *led_cdev,
 	spin_unlock_irqrestore(&ldata->brightness_lock, flags);
 
 	switch (brightness) {
-	case 0:
+	case LED_OFF:
 		data[0] = 0;
 		break;
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	case 5:
-	case 129:
-	case 130:
-	case 131:
-		data[0] = brightness;
-		data[1] = data[2] = 0xFF;
-		break;
 	default:
-		pr_warning("%s: unknown value: %d\n", __func__, brightness);
+		if (brightness <= 131) {
+			data[0] = brightness;
+			data[1] = data[2] = 0xFF;
+			break;
+		} else {
+			pr_warning("%s: unknown value: %d\n",
+					__func__, brightness);
+		}
 		break;
 	}
 

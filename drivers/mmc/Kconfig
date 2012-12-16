@@ -30,7 +30,7 @@ config MMC_PERF_PROFILING
 # Modified by Memory, Studio Software for Zimmer
 config ZIMMER
 	bool "Using new eMMC driver for Zimmer"
-	depends on SWAP != n
+	depends on MMC != n && SWAP != n
 	help
 	  This is an option to enable Zimmer.
 
